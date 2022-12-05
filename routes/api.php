@@ -377,3 +377,6 @@ Route::post('/storeSegmentReturnWay', [App\Http\Controllers\AirBooking\SegmentRe
 Route::get('/editSegmentReturnWay/{id}', [App\Http\Controllers\AirBooking\SegmentReturnWayController::class, 'edit']);
 Route::put('/updateSegmentReturnWay/{id}', [App\Http\Controllers\AirBooking\SegmentReturnWayController::class, 'update']);
 Route::delete('/deleteSegmentReturnWay/{id}', [App\Http\Controllers\AirBooking\SegmentReturnWayController::class, 'destroy']);
+
+//airSearch/oneway route
+Route::get('/oneway', [App\Http\Controllers\AirSearch\OneWayController::class, 'Oneway']);
