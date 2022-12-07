@@ -380,3 +380,7 @@ Route::delete('/deleteSegmentReturnWay/{id}', [App\Http\Controllers\AirBooking\S
 
 //airSearch/oneway route
 Route::get('/oneway', [App\Http\Controllers\AirSearch\OneWayController::class, 'Oneway']);
+
+
+//airSearch/oneway route
+Route::get('/test', [App\Http\Controllers\AirSearch\TestController::class, 'Test']);
