@@ -6,13 +6,11 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
-use App\Models\Control;
-
 
 
 class OneWayController extends Controller
 {
-    public function Oneway(){
+    public function Oneway(Request $request){
         $All = array();
         $FlightType;
 
@@ -243,12 +241,12 @@ class OneWayController extends Controller
                                 $pricingSource = $var['pricingSource'];
                                 $vCarCode = $var['pricingInformation'][0]['fare']['validatingCarrierCode'];+
 
-                            $sql = DB::table('airlines')->select('nameBangla', 'name', 'commission')->where('code', $vCarCode)->get();
-                                $row = mysqli_fetch_array($sql,MYSQLI_ASSOC);
+                            $sqlrow = DB::table('airlines')->select('nameBangla', 'name', 'commission')->where('code', $vCarCode)->get();
 
-                                if(!empty($row)){
-                                    $CarrieerName = $row['name'];
-                                    $fareRate= $row['commission'];
+
+                                if(!empty($sqlrow)){
+                                    $CarrieerName = $sqlrow->name;
+                                    $fareRate= $sqlrow->commission;
                                 }
 
 
@@ -958,31 +956,29 @@ class OneWayController extends Controller
                                     $departureTime = $scheduleDescs[$legref]['departure']['time'];
                                     $markettingCarrier = $scheduleDescs[$legref]['carrier']['marketing'];
 
-                                    $sql = mysqli_query($conn,"SELECT name FROM airlines WHERE code='$markettingCarrier' ");
-                                    $row = mysqli_fetch_array($sql,MYSQLI_ASSOC);
+                                    $sqlrow = DB::table('airlines')->select('name')->where('code', $markettingCarrier)->get();
+                                    // $row = mysqli_fetch_array($sql,MYSQLI_ASSOC);
 
-                                    if(!empty($row)){
-                                        $markettingCarrierName = $row['name'];
+                                    if(!empty($sqlrow)){
+                                        $markettingCarrierName = $sqlrow->name;
                                     }
 
                                     // Departure Country
-                                    $sql1 = mysqli_query($conn,"$Airportsql code='$DepartureFrom' ");
-                                    $row1 = mysqli_fetch_array($sql1,MYSQLI_ASSOC);
+                                    $sql1row = $Airportsql->where('code', $DepartureFrom)->get();
 
-                                    if(!empty($row1)){
-                                        $dAirport = $row1['name'];
-                                        $dCity = $row1['cityName'];
-                                        $dCountry = $row1['countryCode'];
+                                    if(!empty($sql1row)){
+                                        $dAirport = $sql1row->name;
+                                        $dCity = $sql1row->cityName;
+                                        $dCountry = $sql1row->countryCode;
                                     }
 
                                     // Arrival Country
-                                    $sql2 = mysqli_query($conn,"SELECT name, cityName, countryCode FROM airports WHERE code='$ArrivalTo' ");
-                                    $row2 = mysqli_fetch_array($sql2,MYSQLI_ASSOC);
+                                    $sql2row = DB::table('airports')->select('name', 'cityName', 'countryCode')->where('code', $ArrivalTo)->get();
 
-                                    if(!empty($row2)){
-                                        $aAirport = $row2['name'];
-                                        $aCity = $row2['cityName'];
-                                        $aCountry = $row2['countryCode'];
+                                    if(!empty($sql2row)){
+                                        $aAirport = $sql2row->name;
+                                        $aCity = $row2->cityName;
+                                        $aCountry = $sql2row->countryCode;
 
                                     }
 
@@ -1024,8 +1020,8 @@ class OneWayController extends Controller
                                 $hiddenStopOver = $scheduleDescs[$legref]['hiddenStops'];
 
                                     foreach($hiddenStopOver as $hidestop){
-                                        $airpot = $hidestop['airpot'];
-                                        $duration = $airpot['elapsedLayoverTime'];
+                                        $airpot = $hidestop->airpot;
+                                        $duration = $airpot->elapsedLayoverTime;
                                         $time = date('H:i', mktime(0,$duration));
                                         $stopoverdetails = array("airport" => $airpot,
                                                                 "time"=> $time);
@@ -1036,8 +1032,8 @@ class OneWayController extends Controller
 
 
                                 $segment = array("0" =>
-                                                    array("marketingcareer"=> "$markettingCarrier",
-                                                          "marketingcareerName"=> "$markettingCarrierName",
+                                                  array("marketingcareer"=> "$markettingCarrier",
+                                                        "marketingcareerName"=> "$markettingCarrierName",
                                                         "marketingflight"=> "$markettingFN",
                                                         "operatingcareer"=> "$operatingCarrier",
                                                         "operatingflight"=> "$operatingFN",
@@ -1137,24 +1133,22 @@ class OneWayController extends Controller
 
 
                                     // Departure Country
-                                    $sql1 = mysqli_query($conn,"$Airportsql code='$DepartureFrom' ");
-                                    $row1 = mysqli_fetch_array($sql1,MYSQLI_ASSOC);
+                                    $sql1row1 = $Airportsql->where('code', $DepartureFrom)->get();
 
-                                    if(!empty($row1)){
-                                    $dAirport = $row1['name'];
-                                    $dCity = $row1['cityName'];
-                                    $dCountry = $row1['countryCode'];
+                                    if(!empty($sql1row1)){
+                                    $dAirport = $sql1row1->name;
+                                    $dCity = $sql1row1->cityName;
+                                    $dCountry = $sql1row1->countryCode;
 
                                     }
 
                                     // Departure Country
-                                    $sql2 = mysqli_query($conn,"SELECT name, cityName, countryCode FROM airports WHERE code='$ArrivalTo' ");
-                                    $row2 = mysqli_fetch_array($sql2,MYSQLI_ASSOC);
+                                    $sql2row2 = DB::table('airports')->select('name', 'cityName', 'countryCode')->where('code', $ArrivalTo)->get();
 
-                                    if(!empty($row2)){
-                                    $aAirport = $row2['name'];
-                                    $aCity = $row2['cityName'];
-                                    $aCountry = $row2['countryCode'];
+                                    if(!empty($sql2row2)){
+                                    $aAirport = $sql2row2->name;
+                                    $aCity = $sql2row2->cityName;
+                                    $aCountry = $sql2row2->countryCode;
 
                                     }
 
@@ -1163,11 +1157,11 @@ class OneWayController extends Controller
                                     $operatingCarrier = $scheduleDescs[$legref]['carrier']['operating'];
                                     $operatingFN = $scheduleDescs[$legref]['carrier']['operatingFlightNumber'];
 
-                                    $carriersql = mysqli_query($conn,"SELECT name FROM airlines WHERE code='$markettingCarrier' ");
-                                    $carrierrow = mysqli_fetch_array($carriersql,MYSQLI_ASSOC);
 
-                                    if(!empty($carrierrow)){
-                                        $markettingCarrierName = $carrierrow['name'];
+                                    $carriersqlrow = DB::table('airlines')->select('name')->where('code', $markettingCarrier)->get();
+
+                                    if(!empty($carriersqlrow)){
+                                        $markettingCarrierName = $carriersqlrow->name;
                                     }
 
                                     if(isset($fareComponents[0]['segments'][0]['segment']['seatsAvailable'])){
@@ -1255,31 +1249,30 @@ class OneWayController extends Controller
                                     $departureTime1 = $scheduleDescs[$legref1]['departure']['time'];
                                     $markettingCarrier1 = $scheduleDescs[$legref1]['carrier']['marketing'];
 
-                                    $carriersql1 = mysqli_query($conn,"SELECT name FROM airlines WHERE code='$markettingCarrier1' ");
-                                    $carrierrow1 = mysqli_fetch_array($carriersql1,MYSQLI_ASSOC);
 
-                                    if(!empty($carrierrow1)){
-                                        $markettingCarrierName1 = $carrierrow1['name'];
+                                    $carrierrsql1row1 = DB::table('airlines')->select('name')->where('code', $markettingCarrier1)->get();
+
+
+                                    if(!empty($carrierrsql1row1)){
+                                        $markettingCarrierName1 = $carrierrsql1row1->name;
                                     }
 
                                     // Departure Country
-                                    $sql3 = mysqli_query($conn,"$Airportsql code='$DepartureFrom1' ");
-                                    $row3 = mysqli_fetch_array($sql3,MYSQLI_ASSOC);
+                                    $sql3row3 = $Airportsql->where('code', $DepartureFrom1)->get();
 
-                                    if(!empty($row3)){
-                                        $dAirport1 = $row3['name'];
-                                        $dCity1 = $row3['cityName'];
-                                        $dCountry1 = $row3['countryCode'];
+                                    if(!empty($sql3row3)){
+                                        $dAirport1 = $sql3row3->name;
+                                        $dCity1 = $sql3row3->cityName;
+                                        $dCountry1 = $sql3row3->countryCode;
                                     }
 
                                     // Departure Country
-                                    $sql4 = mysqli_query($conn,"SELECT name, cityName, countryCode FROM airports WHERE code='$ArrivalTo1' ");
-                                    $row4 = mysqli_fetch_array($sql4,MYSQLI_ASSOC);
+                                    $sql4row4 = DB::table('airports')->select('name', 'cityName', 'countryCode')->where('code', $ArrivalTo1)->get();
 
-                                    if(!empty($row4)){
-                                        $aAirport1 = $row4['name'];
-                                        $aCity1 = $row4['cityName'];
-                                        $aCountry1 = $row4['countryCode'];
+                                    if(!empty($sql4row4)){
+                                        $aAirport1 = $sql4row4->name;
+                                        $aCity1 = $sql4row4->cityName;
+                                        $aCountry1 = $sql4row4->countryCode;
 
                                     }
 
@@ -1441,32 +1434,29 @@ class OneWayController extends Controller
                                     $departureTime = $scheduleDescs[$legref]['departure']['time'];
                                     $markettingCarrier = $scheduleDescs[$legref]['carrier']['marketing'];
 
-                                    $carriersql = mysqli_query($conn,"SELECT name FROM airlines WHERE code='$markettingCarrier' ");
-                                    $carrierrow = mysqli_fetch_array($carriersql,MYSQLI_ASSOC);
+                                    $carriersqlrow = DB::table('airlines')->select('name')->where('code', $markettingCarrier)->get();
 
-                                    if(!empty($carrierrow)){
-                                        $markettingCarrierName = $carrierrow['name'];
+                                    if(!empty($carriersqlrow)){
+                                        $markettingCarrierName = $carriersqlrow->name;
                                     }
 
                                     // Departure Country
-                                    $sql1 = mysqli_query($conn,"$Airportsql code='$DepartureFrom' ");
-                                    $row1 = mysqli_fetch_array($sql1,MYSQLI_ASSOC);
+                                    $sql1row1 = $Airportsql->where('code', $DepartureFrom)->get();
 
-                                    if(!empty($row1)){
-                                    $dAirport = $row1['name'];
-                                    $dCity = $row1['cityName'];
-                                    $dCountry = $row1['countryCode'];
+                                    if(!empty($sql1row1)){
+                                    $dAirport = $sql1row1->name;
+                                    $dCity = $sql1row1->cityName;
+                                    $dCountry = $sql1row1->countryCode;
 
                                     }
 
                                     // Departure Country
-                                    $sql2 = mysqli_query($conn,"SELECT name, cityName, countryCode FROM airports WHERE code='$ArrivalTo' ");
-                                    $row2 = mysqli_fetch_array($sql2,MYSQLI_ASSOC);
+                                    $sql2row2 = DB::table('airports')->select('name', 'cityName', 'countryCode')->where('code', $ArrivalTo)->get();
 
-                                    if(!empty($row2)){
-                                    $aAirport = $row2['name'];
-                                    $aCity = $row2['cityName'];
-                                    $aCountry = $row2['countryCode'];
+                                    if(!empty($sql2row2)){
+                                    $aAirport = $sql2row2->name;
+                                    $aCity = $sql2row2->cityName;
+                                    $aCountry = $sql2row2->countryCode;
 
                                     }
 
@@ -1560,33 +1550,31 @@ class OneWayController extends Controller
                                     $departureTime1 = $scheduleDescs[$legref1]['departure']['time'];
                                     $markettingCarrier1 = $scheduleDescs[$legref1]['carrier']['marketing'];
 
-                                    $carriersql1 = mysqli_query($conn,"SELECT name FROM airlines WHERE code='$markettingCarrier1' ");
-                                    $carrierrow1 = mysqli_fetch_array($carriersql1,MYSQLI_ASSOC);
 
-                                    if(!empty($carrierrow1)){
-                                    $markettingCarrierName1 = $carrierrow1['name'];
+                                    $carriersql1row1 = DB::table('airlines')->select('name')->where('code', $markettingCarrier1)->get();
 
-                                    }
-
-                                    // Departure Country
-                                    $sql3 = mysqli_query($conn,"$Airportsql code='$DepartureFrom1' ");
-                                    $row3 = mysqli_fetch_array($sql3,MYSQLI_ASSOC);
-
-                                    if(!empty($row3)){
-                                    $dAirport1 = $row3['name'];
-                                    $dCity1 = $row3['cityName'];
-                                    $dCountry1 = $row3['countryCode'];
+                                    if(!empty($carriersql1row1)){
+                                    $markettingCarrierName1 = $carriersql1row1->name;
 
                                     }
 
                                     // Departure Country
-                                    $sql4 = mysqli_query($conn,"SELECT name, cityName, countryCode FROM airports WHERE code='$ArrivalTo1' ");
-                                    $row4 = mysqli_fetch_array($sql4,MYSQLI_ASSOC);
+                                    $sql3row3 = $Airportsql->where('code', $DepartureFrom1)->get();
 
-                                    if(!empty($row4)){
-                                        $aAirport1 = $row4['name'];
-                                        $aCity1 = $row4['cityName'];
-                                        $aCountry1 = $row4['countryCode'];
+                                    if(!empty($sql3row3)){
+                                    $dAirport1 = $sql3row3->name;
+                                    $dCity1 = $sql3row3->cityName;
+                                    $dCountry1 = $sql3row3->countryCode;
+
+                                    }
+
+                                    // Departure Country
+                                    $sql4row4 = DB::table('airports')->select('name', 'cityName', 'countryCode')->where('code', $ArrivalTo1)->get();
+
+                                    if(!empty($sql4row4)){
+                                        $aAirport1 = $sql4row4->name;
+                                        $aCity1 = $sql4row4->cityName;
+                                        $aCountry1 = $sql4row4->countryCode;
 
                                     }
 
@@ -1688,32 +1676,31 @@ class OneWayController extends Controller
                                     $departureTime2 = $scheduleDescs[$legref2]['departure']['time'];
                                     $markettingCarrier2 = $scheduleDescs[$legref2]['carrier']['marketing'];
 
-                                    $carriersql2 = mysqli_query($conn,"SELECT name FROM airlines WHERE code='$markettingCarrier2' ");
-                                    $carrierrow2 = mysqli_fetch_array($carriersql2,MYSQLI_ASSOC);
 
-                                    if(!empty($carrierrow2)){
-                                        $markettingCarrierName2 = $carrierrow2['name'];
+                                    $carriersql2row2 = DB::table('airlines')->select('name')->where('code', $markettingCarrier2)->get();
+
+                                    if(!empty($carriersql2row2)){
+                                        $markettingCarrierName2 = $carriersql2row2->name;
                                     }
 
                                     // Departure Country
-                                    $dsql3 = mysqli_query($conn,"$Airportsql code='$DepartureFrom2' ");
-                                    $drow3 = mysqli_fetch_array($dsql3,MYSQLI_ASSOC);
+                                    $dsql3drow3 = $Airportsql->where('code', $DepartureFrom2)->get();
 
-                                    if(!empty($drow3)){
-                                    $dAirport2 = $drow3['name'];
-                                    $dCity2 = $drow3['cityName'];
-                                    $dCountry2 = $drow3['countryCode'];
+                                    if(!empty($dsql3drow3)){
+                                    $dAirport2 = $dsql3drow3->name;
+                                    $dCity2 = $dsql3drow3->cityName;
+                                    $dCountry2 = $dsql3drow3->countryCode;
 
                                     }
 
                                     // Arrival Country
-                                    $asql4 = mysqli_query($conn,"SELECT name, cityName, countryCode FROM airports WHERE code='$ArrivalTo2' ");
-                                    $arow4 = mysqli_fetch_array($asql4,MYSQLI_ASSOC);
 
-                                    if(!empty($arow4)){
-                                        $aAirport2 = $arow4['name'];
-                                        $aCity2 = $arow4['cityName'];
-                                        $aCountry2 = $arow4['countryCode'];
+                                    $asql4arow4 = DB::table('airports')->select('name', 'cityName', 'countryCode')->where('code', $ArrivalTo2)->get();
+
+                                    if(!empty($asql4arow4)){
+                                        $aAirport2 = $asql4arow4->name;
+                                        $aCity2 = $asql4arow4->cityName;
+                                        $aCountry2 = $asql4arow4->countryCode;
 
                                     }
 
@@ -1813,32 +1800,30 @@ class OneWayController extends Controller
                                     $departureTime2 = $scheduleDescs[$legref2]['departure']['time'];
                                     $markettingCarrier2 = $scheduleDescs[$legref2]['carrier']['marketing'];
 
-                                    $carriersql2 = mysqli_query($conn,"SELECT name FROM airlines WHERE code='$markettingCarrier2' ");
-                                    $carrierrow2 = mysqli_fetch_array($carriersql2,MYSQLI_ASSOC);
 
-                                    if(!empty($carrierrow2)){
-                                        $markettingCarrierName2 = $carrierrow2['name'];
+                                    $carriersql2row2 = DB::table('airlines')->select('name')->where('code', $markettingCarrier2)->get();
+
+                                    if(!empty($carriersql2row2)){
+                                        $markettingCarrierName2 = $carriersql2row2->name;
                                     }
 
                                     // Departure Country
-                                    $dsql3 = mysqli_query($conn,"$Airportsql code='$DepartureFrom2' ");
-                                    $drow3 = mysqli_fetch_array($dsql3,MYSQLI_ASSOC);
+                                    $dsql3drow3 = $Airportsql->where('code', $DepartureFrom2)->get();
 
-                                    if(!empty($drow3)){
-                                    $dAirport2 = $drow3['name'];
-                                    $dCity2 = $drow3['cityName'];
-                                    $dCountry2 = $drow3['countryCode'];
+                                    if(!empty($dsql3drow3)){
+                                    $dAirport2 = $dsql3drow3->name;
+                                    $dCity2 = $dsql3drow3->cityName;
+                                    $dCountry2 = $dsql3drow3->countryCode;
 
                                     }
 
                                     // Arrival Country
-                                    $asql4 = mysqli_query($conn,"SELECT name, cityName, countryCode FROM airports WHERE code='$ArrivalTo2' ");
-                                    $arow4 = mysqli_fetch_array($asql4,MYSQLI_ASSOC);
+                                    $asql4arow4 = DB::table('airports')->select('name', 'cityName','countryCode')->where('code', $ArrivalTo2);
 
-                                    if(!empty($arow4)){
-                                        $aAirport2 = $arow4['name'];
-                                        $aCity2 = $arow4['cityName'];
-                                        $aCountry2 = $arow4['countryCode'];
+                                    if(!empty($asql4arow4)){
+                                        $aAirport2 = $asql4arow4->name;
+                                        $aCity2 = $asql4arow4->cityName;
+                                        $aCountry2 = $asql4arow4->countryCode;
 
                                     }
 
@@ -2028,32 +2013,31 @@ class OneWayController extends Controller
                                     $departureTime = $scheduleDescs[$legref]['departure']['time'];
                                     $markettingCarrier = $scheduleDescs[$legref]['carrier']['marketing'];
 
-                                    $carriersql = mysqli_query($conn,"SELECT name FROM airlines WHERE code='$markettingCarrier' ");
-                                    $carrierrow = mysqli_fetch_array($carriersql,MYSQLI_ASSOC);
 
-                                    if(!empty($carrierrow)){
-                                        $markettingCarrierName = $carrierrow['name'];
+                                    $carriersqlrow = DB::table('airlines')->select('name')->where('code', $markettingCarrier)->get();
+
+                                    if(!empty($carriersqlrow)){
+                                        $markettingCarrierName = $carriersqlrow->name;
                                     }
 
                                     // Departure Country
-                                    $sql1 = mysqli_query($conn,"$Airportsql code='$DepartureFrom' ");
-                                    $row1 = mysqli_fetch_array($sql1,MYSQLI_ASSOC);
+                                    $sql1row1 = $Airportsql->where('code', $DepartureFrom)->get();
 
-                                    if(!empty($row1)){
-                                    $dAirport = $row1['name'];
-                                    $dCity = $row1['cityName'];
-                                    $dCountry = $row1['countryCode'];
+                                    if(!empty($sql1row1)){
+                                    $dAirport = $sql1row1->name;
+                                    $dCity = $sql1row1->cityName;
+                                    $dCountry = $sql1row1->countryCode;
 
                                     }
 
                                     // Departure Country
-                                    $sql2 = mysqli_query($conn,"SELECT name, cityName, countryCode FROM airports WHERE code='$ArrivalTo' ");
-                                    $row2 = mysqli_fetch_array($sql2,MYSQLI_ASSOC);
 
-                                    if(!empty($row2)){
-                                    $aAirport = $row2['name'];
-                                    $aCity = $row2['cityName'];
-                                    $aCountry = $row2['countryCode'];
+                                    $sql2row2 = DB::table('airports')->select('name', 'cityName', 'countryCode')->where('code', $ArrivalTo)->get();
+
+                                    if(!empty($sql2row2)){
+                                    $aAirport = $sql2row2->name;
+                                    $aCity = $sql2row2->cityName;
+                                    $aCountry = $sql2row2->countryCode;
 
                                     }
 
@@ -2147,33 +2131,33 @@ class OneWayController extends Controller
                                     $departureTime1 = $scheduleDescs[$legref1]['departure']['time'];
                                     $markettingCarrier1 = $scheduleDescs[$legref1]['carrier']['marketing'];
 
-                                    $carriersql1 = mysqli_query($conn,"SELECT name FROM airlines WHERE code='$markettingCarrier1' ");
-                                    $carrierrow1 = mysqli_fetch_array($carriersql1,MYSQLI_ASSOC);
 
-                                    if(!empty($carrierrow1)){
-                                    $markettingCarrierName1 = $carrierrow1['name'];
+                                    $carriersql1row1 = DB::table('airlines')->select('name')->where('code',$markettingCarrier1)->get();
 
-                                    }
-
-                                    // Departure Country
-                                    $sql3 = mysqli_query($conn,"$Airportsql code='$DepartureFrom1' ");
-                                    $row3 = mysqli_fetch_array($sql3,MYSQLI_ASSOC);
-
-                                    if(!empty($row3)){
-                                    $dAirport1 = $row3['name'];
-                                    $dCity1 = $row3['cityName'];
-                                    $dCountry1 = $row3['countryCode'];
+                                    if(!empty($carriersql1row1)){
+                                    $markettingCarrierName1 = $carriersql1row1['name'];
 
                                     }
 
                                     // Departure Country
-                                    $sql4 = mysqli_query($conn,"SELECT name, cityName, countryCode FROM airports WHERE code='$ArrivalTo1' ");
-                                    $row4 = mysqli_fetch_array($sql4,MYSQLI_ASSOC);
 
-                                    if(!empty($row4)){
-                                        $aAirport1 = $row4['name'];
-                                        $aCity1 = $row4['cityName'];
-                                        $aCountry1 = $row4['countryCode'];
+                                    $sql3row3 = $Airportsql->where('code', $DepartureFrom1)->get();
+
+                                    if(!empty($sql3row3)){
+                                    $dAirport1 = $sql3row3->name;
+                                    $dCity1 = $sql3row3->cityName;
+                                    $dCountry1 = $sql3row3->countryCode;
+
+                                    }
+
+                                    // Departure Country
+
+                                    $sql4row4 = DB::table('airports')->select('name', 'cityName', 'contryCode')->where('code', $ArrivalTo1)->get();
+
+                                    if(!empty($sql4row4)){
+                                        $aAirport1 = $sql4row4->name;
+                                        $aCity1 = $sql4row4->cityName;
+                                        $aCountry1 = $sql4row4->countryCode;
 
                                     }
 
@@ -2275,32 +2259,32 @@ class OneWayController extends Controller
                                     $departureTime2 = $scheduleDescs[$legref2]['departure']['time'];
                                     $markettingCarrier2 = $scheduleDescs[$legref2]['carrier']['marketing'];
 
-                                    $carriersql2 = mysqli_query($conn,"SELECT name FROM airlines WHERE code='$markettingCarrier2' ");
-                                    $carrierrow2 = mysqli_fetch_array($carriersql2,MYSQLI_ASSOC);
 
-                                    if(!empty($carrierrow2)){
-                                        $markettingCarrierName2 = $carrierrow2['name'];
+                                    $carriersql2row2 = DB::table('airlines')->select('name')->where('code', $markettingCarrier2)->get();
+
+                                    if(!empty($carriersql2row2)){
+                                        $markettingCarrierName2 = $carriersql2row2->name;
                                     }
 
                                     // Departure Country
-                                    $dsql3 = mysqli_query($conn,"$Airportsql code='$DepartureFrom2' ");
-                                    $drow3 = mysqli_fetch_array($dsql3,MYSQLI_ASSOC);
 
-                                    if(!empty($drow3)){
-                                    $dAirport2 = $drow3['name'];
-                                    $dCity2 = $drow3['cityName'];
-                                    $dCountry2 = $drow3['countryCode'];
+                                    $dsql3drow3 = $Airportsql->where('code', $DepartureFrom2)->get();
+
+                                    if(!empty($dsql3drow3)){
+                                    $dAirport2 = $dsql3drow3->name;
+                                    $dCity2 = $dsql3drow3->cityName;
+                                    $dCountry2 = $dsql3drow3->countryCode;
 
                                     }
 
                                     // Arrival Country
-                                    $asql4 = mysqli_query($conn,"SELECT name, cityName, countryCode FROM airports WHERE code='$ArrivalTo2' ");
-                                    $arow4 = mysqli_fetch_array($asql4,MYSQLI_ASSOC);
 
-                                    if(!empty($arow4)){
-                                        $aAirport2 = $arow4['name'];
-                                        $aCity2 = $arow4['cityName'];
-                                        $aCountry2 = $arow4['countryCode'];
+                                    $asql4arow4 = DB::table('airports')->select('name', 'cityName', 'countryCode')->where('code', $ArrivalTo2)->get();
+
+                                    if(!empty($asql4arow4)){
+                                        $aAirport2 = $asql4arow4->name;
+                                        $aCity2 = $asql4arow4->cityName;
+                                        $aCountry2 = $asql4arow4->countryCode;
 
                                     }
 
@@ -2402,32 +2386,30 @@ class OneWayController extends Controller
                                     $departureTime3 = $scheduleDescs[$legref3]['departure']['time'];
                                     $markettingCarrier3 = $scheduleDescs[$legref3]['carrier']['marketing'];
 
-                                    $carriersql3 = mysqli_query($conn,"SELECT name FROM airlines WHERE code='$markettingCarrier3' ");
-                                    $carrierrow3 = mysqli_fetch_array($carriersql3,MYSQLI_ASSOC);
 
-                                    if(!empty($carrierrow3)){
-                                        $markettingCarrierName3 = $carrierrow3['name'];
+                                    $carriersql3row3 = DB::table('airlines')->select('name')->where('code', $markettingCarrier3)->get();
+
+                                    if(!empty($carriersql3row3)){
+                                        $markettingCarrierName3 = $carriersql3row3->name;
                                     }
 
                                     // Departure Country
-                                    $dsql4 = mysqli_query($conn,"$Airportsql code='$DepartureFrom3' ");
-                                    $drow4 = mysqli_fetch_array($dsql4,MYSQLI_ASSOC);
+                                    $dsql4drow4 = $Airportsql->where('code', $DepartureFrom3)->get();
 
-                                    if(!empty($drow4)){
-                                    $dAirport3 = $drow4['name'];
-                                    $dCity3 = $drow4['cityName'];
-                                    $dCountry3 = $drow4['countryCode'];
+                                    if(!empty($dsql4drow4)){
+                                    $dAirport3 = $dsql4drow4->name;
+                                    $dCity3 = $dsql4drow4->cityName;
+                                    $dCountry3 = $dsql4drow4->countryCode;
 
                                     }
 
                                     // Arrival Country
-                                    $asql4 = mysqli_query($conn,"SELECT name, cityName, countryCode FROM airports WHERE code='$ArrivalTo3' ");
-                                    $arow4 = mysqli_fetch_array($asql4,MYSQLI_ASSOC);
+                                    $asql4arow4 = DB::table('airports')->select('name', 'cityName', 'countryCode')->where('code', $ArrivalTo3)->get();
 
-                                    if(!empty($arow4)){
-                                        $aAirport3 = $arow4['name'];
-                                        $aCity3 = $arow4['cityName'];
-                                        $aCountry3 = $arow4['countryCode'];
+                                    if(!empty($asql4arow4)){
+                                        $aAirport3 = $asql4arow4->name;
+                                        $aCity3 = $asql4arow4->cityName;
+                                        $aCountry3 = $asql4arow4->countryCode;
 
                                     }
 
