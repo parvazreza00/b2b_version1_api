@@ -34,10 +34,13 @@ class OneWayController extends Controller
             if($Way == 'oneway'){
 
                 if(array_key_exists('journeyFrom', $_GET) && array_key_exists('journeyto', $_GET) && array_key_exists('departuredate',$_GET)){
-                    $From = $_GET['journeyfrom'];
-                    $To = $_GET['journeyto'];
-                    $Date = $_GET['departuredate'];
+                    $From = $request->input('journeyfrom');
+                    $To = $request->input('journeyto');
+                    $Date = $request->input('departuredate');
                     $ActualDate = $Date."T00:00:00";
+
+                    print_r($From);
+
 
                     //trip type
                     $fromrow = DB::table('airports')->select('name', 'cityName', 'countryCode')->where('code', $From);
