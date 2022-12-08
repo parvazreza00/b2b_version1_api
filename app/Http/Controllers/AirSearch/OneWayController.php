@@ -13,7 +13,7 @@ class OneWayController extends Controller
     public function Oneway(Request $request){
         $All = array();
         $FlightType;
-
+//erwrrrrrrrrrrrrrrrrrrrrrrrrrrr
         $controlrow = DB::table('control')->find(1);
         // return response()->json($controlrow);
 
